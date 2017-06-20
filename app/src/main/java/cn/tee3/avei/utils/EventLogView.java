@@ -34,7 +34,51 @@ public class EventLogView extends LinearLayout {
         svMessage = (ScrollView) findViewById(R.id.sv_message);
     }
 
-    public void addEventLog(String messageStr, TextView tvMessage) {
+    /**
+     * 加入详细日志
+     *
+     * @param messageStr
+     */
+    public void addDetailsLog(String messageStr) {
+        TextView tvMessage = new TextView(mContext);
+        addEventLog(messageStr, tvMessage);
+    }
+
+    /**
+     * 加入一般日志
+     *
+     * @param messageStr
+     */
+    public void addNormalLog(String messageStr) {
+        TextView tvMessage = new TextView(mContext);
+        tvMessage.setTextColor(getResources().getColor(R.color.NormalLog));
+        addEventLog(messageStr, tvMessage);
+    }
+
+    /**
+     * 加入重要日志
+     *
+     * @param messageStr
+     */
+    public void addImportantLog(String messageStr) {
+        TextView tvMessage = new TextView(mContext);
+        tvMessage.setTextColor(getResources().getColor(R.color.ImportantLog));
+        addEventLog(messageStr, tvMessage);
+    }
+
+    /**
+     * 加入非常重要日志
+     *
+     * @param messageStr
+     */
+    public void addVeryImportantLog(String messageStr) {
+        TextView tvMessage = new TextView(mContext);
+        tvMessage.setTextColor(getResources().getColor(R.color.VeryImportantLog));
+        addEventLog(messageStr, tvMessage);
+    }
+
+
+    private void addEventLog(String messageStr, TextView tvMessage) {
         tvMessage.setText(messageStr);
         llMessage.addView(tvMessage);
 //        需要注意的是，
@@ -48,32 +92,5 @@ public class EventLogView extends LinearLayout {
                 svMessage.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
-    }
-
-    /**
-     * 加入zhengc
-     * @param messageStr
-     */
-    public void addDetailsLog(String messageStr) {
-        TextView tvMessage = new TextView(mContext);
-        addEventLog(messageStr, tvMessage);
-    }
-
-    public void addNormalLog(String messageStr) {
-        TextView tvMessage = new TextView(mContext);
-        tvMessage.setTextColor(getResources().getColor(R.color.colorAccent));
-        addEventLog(messageStr, tvMessage);
-    }
-
-    public void addImportantLog(String messageStr) {
-        TextView tvMessage = new TextView(mContext);
-        tvMessage.setTextColor(getResources().getColor(R.color.colorAccent));
-        addEventLog(messageStr, tvMessage);
-    }
-
-    public void addVeryImportantLog(String messageStr) {
-        TextView tvMessage = new TextView(mContext);
-        tvMessage.setTextColor(getResources().getColor(R.color.red));
-        addEventLog(messageStr, tvMessage);
     }
 }

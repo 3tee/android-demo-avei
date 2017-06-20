@@ -112,6 +112,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                 int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
                 if (0 != ret) {
                     Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
+                    logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
                 }
             }
         });
@@ -132,13 +133,13 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
 
     boolean check_ret(int ret) {
         if (ErrorCode.AVD_OK != ret) {
-            logView.addEventLog("加入房间失败");
+            logView.addVeryImportantLog("加入房间失败：ErrorCode=" + ret);
             Log.w(TAG, "check_ret: ret=" + ret);
             avRoom.dispose();
             avRoom = null;
             return false;
         }
-        logView.addEventLog("加入房间成功");
+        logView.addImportantLog("加入房间成功");
         return true;
     }
 
@@ -162,8 +163,8 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
     }
 
     private void startImporter() {
-        logView.addEventLog("开始导入音视频");
-        logView.addEventLog("请用幸会加入此房间查看导入的音视频");
+        logView.addImportantLog("开始导入音视频");
+        logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
         mTimerUtils.updateTimer();
         mVideoCapture.setOnPreviewFrameCallback(mOnPreviewFrameCallback);
@@ -172,9 +173,13 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
             mRecordingThread = new AudioCaptureThread(new AudioCaptureThread.AudioDataListener() {
                 @Override
                 public void onAudioData(long timestamp_ns, int sampleRate, int channels, byte[] data, int len) {
-                    mFakeAudioCapturer.inputCapturedFrame(timestamp_ns, sampleRate, channels, data, len);
+                    int ret = mFakeAudioCapturer.inputCapturedFrame(timestamp_ns, sampleRate, channels, data, len);
                     audioFrameNum = audioFrameNum + 1;
                     audioDataSize = audioDataSize + len;
+                    if (0 != ret) {
+                        Log.i(TAG, "source inputCapturedFrame failed. ret=" + ret);
+                        logView.addVeryImportantLog("音频导入失败：ErrorCode=" + ret);
+                    }
                 }
             });
             mRecordingThread.start();
@@ -197,6 +202,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                     Log.i(TAG, "inputCapturedFrame pts=" + pts);
                     if (0 != ret) {
                         Log.i(TAG, "source inputCapturedFrame failed. ret=" + ret);
+                        logView.addVeryImportantLog("视频导入失败：ErrorCode=" + ret);
                     }
                 }
             }
@@ -206,8 +212,8 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
     private Runnable messageRunnable = new Runnable() {
         public void run() {
             if (isImport) {
-                logView.addEventLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
-                logView.addEventLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
+                logView.addDetailsLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
+                logView.addDetailsLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
                 mHandler.postDelayed(messageRunnable, 3000);
             }
         }
@@ -218,7 +224,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
             Log.i(TAG, "stopRoom, room is not created.");
             return;
         }
-        logView.addEventLog("停止导入音视频");
+        logView.addImportantLog("停止导入音视频");
         Log.i(TAG, "stopImporter, begin...");
         //视频停止导入
         if (null != mVideoCapture) {

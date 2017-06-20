@@ -132,13 +132,13 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
      */
     private boolean check_ret(int ret) {
         if (ErrorCode.AVD_OK != ret) {
-            logView.addEventLog("加入房间失败");
             Log.w(TAG, "check_ret: ret=" + ret);
+            logView.addVeryImportantLog("加入房间失败：ErrorCode=" + ret);
             AVImporter.destoryImporter(mAVimporter);
             mAVimporter = null;
             return false;
         }
-        logView.addEventLog("加入房间成功");
+        logView.addImportantLog("加入房间成功");
         return true;
     }
 
@@ -165,8 +165,8 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
      * 开始导入音视频
      */
     private void startImporter() {
-        logView.addEventLog("开始导入音视频");
-        logView.addEventLog("请用幸会加入此房间查看导入的音视频");
+        logView.addImportantLog("开始导入音视频");
+        logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
         mTimerUtils.updateTimer();
         mVideoCapture.setOnPreviewFrameCallback(mOnPreviewFrameCallback);
@@ -175,7 +175,11 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
             mRecordingThread = new AudioCaptureThread(new AudioCaptureThread.AudioDataListener() {
                 @Override
                 public void onAudioData(long timestamp_ns, int sampleRate, int channels, byte[] data, int len) {
-                    mAVimporter.audio_inputPCMFrame(timestamp_ns, sampleRate, channels, data, len);
+                    int ret = mAVimporter.audio_inputPCMFrame(timestamp_ns, sampleRate, channels, data, len);
+                    if (0 != ret) {
+                        Log.e(TAG, "audio_inputPCMFrame failed. ret=" + ret);
+                        logView.addVeryImportantLog("音频导入失败：ErrorCode=" + ret);
+                    }
                     audioFrameNum = audioFrameNum + 1;
                     audioDataSize = audioDataSize + len;
                 }
@@ -196,7 +200,8 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
                     videoFrameNum = videoFrameNum + 1;
                     videoDataSize = videoDataSize + data.length;
                     if (0 != ret) {
-                        Log.i(TAG, "video_inputRAWFrame failed. ret=" + ret);
+                        Log.e(TAG, "video_inputRAWFrame failed. ret=" + ret);
+                        logView.addVeryImportantLog("视频导入失败：ErrorCode=" + ret);
                     }
                 }
             }
@@ -206,8 +211,8 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
     private Runnable messageRunnable = new Runnable() {
         public void run() {
             if (isImport) {
-                logView.addEventLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
-                logView.addEventLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
+                logView.addDetailsLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
+                logView.addDetailsLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
                 mHandler.postDelayed(messageRunnable, 3000);
             }
         }
@@ -221,7 +226,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         if (null == mAVimporter) {
             return;
         }
-        logView.addEventLog("停止导入音视频");
+        logView.addImportantLog("停止导入音视频");
         Log.i(TAG, "stopImporter, begin...");
         if (null != mRecordingThread) {
             mRecordingThread.stopMe();

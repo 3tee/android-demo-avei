@@ -124,6 +124,7 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
                     int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
                     if (0 != ret) {
                         Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
+                        logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
                     }
                     mRtspclient.setVideoCapture(mFakeVideoCapturer);
                 }
@@ -147,13 +148,13 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
 
     boolean check_ret(int ret) {
         if (ErrorCode.AVD_OK != ret) {
-            logView.addEventLog("加入房间失败");
+            logView.addVeryImportantLog("加入房间失败：ErrorCode=" + ret);
             Log.w(TAG, "check_ret: ret=" + ret);
             avRoom.dispose();
             avRoom = null;
             return false;
         }
-        logView.addEventLog("加入房间成功");
+        logView.addImportantLog("加入房间成功");
         return true;
     }
 
@@ -178,8 +179,8 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
 
     private void startImporter() {
         mRtspclient.start(AppKey.rtsp_uri, "admin", "Hik12345");
-        logView.addEventLog("开始导入音视频");
-        logView.addEventLog("请用幸会加入此房间查看导入的音视频");
+        logView.addImportantLog("开始导入音视频");
+        logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
         mTimerUtils.updateTimer();
         //音频导入
@@ -187,11 +188,15 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
             mRecordingThread = new AudioCaptureThread(new AudioCaptureThread.AudioDataListener() {
                 @Override
                 public void onAudioData(long timestamp_ns, int sampleRate, int channels, byte[] data, int len) {
-                    mFakeAudioCapturer.inputCapturedFrame(timestamp_ns, sampleRate, channels, data, len);
+                    int ret = mFakeAudioCapturer.inputCapturedFrame(timestamp_ns, sampleRate, channels, data, len);
                     audioFrameNum = audioFrameNum + 1;
                     videoFrameNum = audioFrameNum / 3;
                     audioDataSize = audioDataSize + data.length;
                     videoDataSize = audioDataSize * 100;
+                    if (0 != ret) {
+                        Log.e(TAG, "inputCapturedFrame failed. ret=" + ret);
+                        logView.addVeryImportantLog("音频导入失败：ErrorCode=" + ret);
+                    }
                 }
             });
             mRecordingThread.start();
@@ -202,8 +207,8 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
     private Runnable messageRunnable = new Runnable() {
         public void run() {
             if (isImport) {
-                logView.addEventLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
-                logView.addEventLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
+                logView.addDetailsLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
+                logView.addDetailsLog("已导入音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
                 mHandler.postDelayed(messageRunnable, 3000);
             }
         }
@@ -215,7 +220,7 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
             return;
         }
         mRtspclient.stop();
-        logView.addEventLog("停止导入音视频");
+        logView.addImportantLog("停止导入音视频");
         Log.i(TAG, "stopImporter, begin...");
         //视频停止导入
         isImport = false;

@@ -98,6 +98,7 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
                     int ret1 = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
                     if (0 != ret1) {
                         Log.e(TAG, "publishLocalCamera failed. ret=" + ret1);
+                        logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret1);
                     } else {
                         Log.i(TAG, "publishLocalCamera. ret=" + ret1);
                     }
@@ -121,13 +122,13 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
 
     boolean check_ret(int ret) {
         if (ErrorCode.AVD_OK != ret) {
-            logView.addEventLog("加入房间失败");
+            logView.addVeryImportantLog("加入房间失败：ErrorCode=" + ret);
             Log.w(TAG, "check_ret: ret=" + ret);
             avRoom.dispose();
             avRoom = null;
             return false;
         }
-        logView.addEventLog("加入房间成功");
+        logView.addImportantLog("加入房间成功");
         return true;
     }
 
@@ -158,8 +159,8 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
     private void startImporter() {
         //视频导入
         is = getResources().openRawResource(R.raw.test);
-        logView.addEventLog("开始导入音视频");
-        logView.addEventLog("请用幸会加入此房间查看导入的音视频");
+        logView.addImportantLog("开始导入音视频");
+        logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         tvCodedImport.setText("正在从文件 test.h264 导入视频数据...");
         isImport = true;
         mTimerUtils.updateTimer();
@@ -259,7 +260,7 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
      * @param importData 上传数据
      */
     private void avImport(byte[] importData) {
-        //未保证质量30毫秒传一帧，少于30毫秒进行等待
+        //为保证质量30毫秒传一帧，少于30毫秒进行等待
         long now = System.currentTimeMillis();
 
         long pts = System.nanoTime();
@@ -308,7 +309,7 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
     private Runnable messageRunnable = new Runnable() {
         public void run() {
             if (isImport) {
-                logView.addEventLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
+                logView.addDetailsLog("已导入视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
                 mHandler.postDelayed(messageRunnable, 3000);
             }
         }
@@ -322,7 +323,7 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
             Log.i(TAG, "stopRoom, room is not created.");
             return;
         }
-        logView.addEventLog("停止导入音视频");
+        logView.addImportantLog("停止导入音视频");
         tvCodedImport.setText("请导入视频数据");
         Log.i(TAG, "stopImporter, begin...");
         //视频停止导入
