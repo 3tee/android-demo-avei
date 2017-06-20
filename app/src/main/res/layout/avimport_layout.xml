@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/title_bar"
+        layout="@layout/public_title_bar" />
+
+    <cn.tee3.avei.utils.EventLogView
+        android:id="@+id/event_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+    </cn.tee3.avei.utils.EventLogView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_import"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/round_corner_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="开始导入"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_import_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/transparent"
+                android:text="导入时长 00:00:00"
+                android:textColor="@android:color/holo_red_light" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+
+        <cn.tee3.avei.PreviewSurface
+            android:id="@+id/ps_local"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+        </cn.tee3.avei.PreviewSurface>
+
+        <android.opengl.GLSurfaceView
+            android:id="@+id/gl_local"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+        </android.opengl.GLSurfaceView>
+
+        <TextView
+            android:id="@+id/tv_coded_import"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:text="请导入视频数据"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

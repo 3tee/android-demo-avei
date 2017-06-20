@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/title_bar"
+        layout="@layout/public_title_bar" />
+
+    <cn.tee3.avei.utils.EventLogView
+        android:id="@+id/event_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+    </cn.tee3.avei.utils.EventLogView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_record"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/round_corner_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="开始录制"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_export"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/round_corner_blue"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="开始导出"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/tv_record_export_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="8dp"
+                android:background="@android:color/transparent"
+                android:text="录制时长 00:00:00"
+                android:textColor="@android:color/holo_red_light" />
+
+            <TextView
+                android:id="@+id/tv_filelist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="查看已录制文件"
+                android:textColor="#000000" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:text="请选择要录制或导出的音频"
+                    android:textColor="#4aabef" />
+
+                <RadioGroup
+                    android:id="@+id/rg_audio_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:checkedButton="@+id/rb_audio_one"
+                    android:orientation="vertical">
+
+                    <RadioButton
+                        android:id="@+id/rb_audio_one"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:checked="false"
+                        android:text="录制所选视频用户的音频"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:id="@+id/rb_audio_without_me"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:checked="false"
+                        android:text="录制除自己外的所有音频"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:id="@+id/rb_audio_all"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:checked="false"
+                        android:text="录制当前房间的所有音频"
+                        android:textColor="#333333" />
+
+                    <RadioButton
+                        android:id="@+id/rb_audio_no"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:checked="false"
+                        android:text="不录制当前房间任何音频"
+                        android:textColor="#333333" />
+                </RadioGroup>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#000000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:text="请选择要录制或者导出的视频"
+                    android:textColor="#4aabef" />
+
+                <ListView
+                    android:id="@+id/lv_cameras"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/division_line"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:cacheColorHint="#00000000"
+                    android:divider="@null"
+                    android:fadeScrollbars="true"
+                    android:fadingEdge="none"
+                    android:listSelector="#00000000"
+                    android:visibility="visible" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/trans_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/transparent" />
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

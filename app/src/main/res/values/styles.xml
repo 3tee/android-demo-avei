@@ -1,0 +1,7 @@
+<resources>
+    <style name="default_ui_bg" parent="android:Theme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+    </style>
+</resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/title_bar"
+        layout="@layout/public_title_bar" />
+
+    <ListView
+        android:id="@+id/lv_functions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/division_line"
+        android:cacheColorHint="#00000000"
+        android:divider="@null"
+        android:fadeScrollbars="true"
+        android:fadingEdge="none"
+        android:listSelector="#00000000"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tv_explain"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tv_joinroom"
+            android:layout_marginTop="10dp"
+            android:lineSpacingMultiplier="1.5"
+            android:padding="20dp"
+            android:text="说明"
+            android:textColor="#333333" />
+
+        <TextView
+            android:id="@+id/tv_joinroom"
+            android:layout_width="315dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/round_corner_blue"
+            android:gravity="center"
+            android:text="加入房间"
+            android:textColor="#ffffff" />
+    </RelativeLayout>
+
+</LinearLayout>
