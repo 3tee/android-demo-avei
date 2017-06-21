@@ -2,6 +2,7 @@ package cn.tee3.avei.avimport;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -111,16 +112,14 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
      */
     private void initDevice(int ret) {
         if (check_ret(ret)) {
-            //启用导入音频、导入视频
-            mAVimporter.enableAudio(true);
-            mAVimporter.enableVideo(true);
-
             mVideoCapture = new VideoCapture();
             mLocalPreviewSurface = (PreviewSurface) findViewById(R.id.ps_local);
             mLocalPreviewSurface.setVisibility(View.VISIBLE);
             mLocalPreviewSurface.setCallback(mVideoCapture.getCallback());
             mVideoCapture.openCamera(VideoCapture.CAMERA_FACING_FRONT, 640, 480,
                     getResources().getConfiguration().orientation);
+
+            mVideoCapture.setOnPreviewFrameCallback(mOnPreviewFrameCallback);
         }
     }
 
@@ -148,10 +147,16 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
             case R.id.tv_import://导入
                 if (isImport) {
                     tvImport.setText("开始导入");
+                    //停用导入音频、导入视频
+                    mAVimporter.enableAudio(false);
+                    mAVimporter.enableVideo(false);
                     stopImporter();
                 } else {
                     TimerUtils.updatePrefixLabel("导入时长 ");
                     tvImport.setText("停止导入");
+                    //启用导入音频、导入视频
+                    mAVimporter.enableAudio(true);
+                    mAVimporter.enableVideo(true);
                     startImporter();
                     mHandler.postDelayed(messageRunnable, 0);
                 }
@@ -169,7 +174,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
         mTimerUtils.updateTimer();
-        mVideoCapture.setOnPreviewFrameCallback(mOnPreviewFrameCallback);
+
         //音频导入
         if (null == mRecordingThread) {
             mRecordingThread = new AudioCaptureThread(new AudioCaptureThread.AudioDataListener() {
@@ -193,7 +198,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         @Override
         public void onPreviewFrameCaptured(int width, int height, byte[] data) { // 摄像头原始图像导入
             if (null != mAVimporter && mAVimporter.isWorking()) {
-                Log.i(TAG, "video_inputRAWFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
+                Log.v(TAG, "video_inputRAWFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
                 if (isImport) {//导入
                     int ret = mAVimporter.video_inputRAWFrame(System.nanoTime(), width, height, data, data.length,
                             mVideoCapture.getmOrientation(), mVideoCapture.isFrontCamera(), FakeVideoCapturer.FourccType.ft_NV21);
@@ -247,6 +252,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mVideoCapture.destroyCamera();
         Log.i(TAG, "onDestory");
         stopImporter();
         AVImporter.destoryImporter(mAVimporter);

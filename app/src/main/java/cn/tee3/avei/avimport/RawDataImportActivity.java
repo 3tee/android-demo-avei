@@ -101,18 +101,9 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                 }
                 if (null == mFakeAudioCapturer) {
                     mFakeAudioCapturer = FakeAudioCapturer.instance();
-                    //启用麦克风
-                    mFakeAudioCapturer.enable(true);
-                    avRoom.maudio.openMicrophone();
                 }
                 if (null == mFakeVideoCapturer) {
                     mFakeVideoCapturer = FakeVideoCapturer.Create(sourceFVC_listener, FakeVideoCapturer.FourccType.ft_NV21, false);
-                }
-                //发布改虚拟Camera
-                int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
-                if (0 != ret) {
-                    Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
-                    logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
                 }
             }
         });
@@ -163,6 +154,16 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
     }
 
     private void startImporter() {
+        //发布虚拟Camera
+        int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
+        if (0 != ret) {
+            Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
+            logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
+        }
+        //启用麦克风
+        mFakeAudioCapturer.enable(true);
+        avRoom.maudio.openMicrophone();
+
         logView.addImportantLog("开始导入音视频");
         logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
@@ -177,7 +178,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                     audioFrameNum = audioFrameNum + 1;
                     audioDataSize = audioDataSize + len;
                     if (0 != ret) {
-                        Log.i(TAG, "source inputCapturedFrame failed. ret=" + ret);
+                        Log.e(TAG, "source inputCapturedFrame failed. ret=" + ret);
                         logView.addVeryImportantLog("音频导入失败：ErrorCode=" + ret);
                     }
                 }
@@ -192,7 +193,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
         public void onPreviewFrameCaptured(int width, int height, byte[] data) { // 摄像头原始图像导入
             if (null != mFakeVideoCapturer && mFakeVideoCapturer.isRunning()) {
                 if (isImport) {
-                    Log.i(TAG, "inputCapturedFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
+                    Log.v(TAG, "inputCapturedFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
                     long pts = System.nanoTime();
                     int ret = mFakeVideoCapturer.inputCapturedFrame(
                             pts, width, height, data, data.length,
@@ -201,7 +202,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                     videoDataSize = videoDataSize + data.length;
                     Log.i(TAG, "inputCapturedFrame pts=" + pts);
                     if (0 != ret) {
-                        Log.i(TAG, "source inputCapturedFrame failed. ret=" + ret);
+                        Log.e(TAG, "source inputCapturedFrame failed. ret=" + ret);
                         logView.addVeryImportantLog("视频导入失败：ErrorCode=" + ret);
                     }
                 }
@@ -220,6 +221,12 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
     };
 
     private void stopImporter() {
+        //取消发布虚拟Camera
+        avRoom.mvideo.unpublishLocalCamera(mFakeCam.getId());
+        //关闭麦克风//此处不设置 mFakeAudioCapturer.enable也不影响
+        mFakeAudioCapturer.enable(false);
+        avRoom.maudio.closeMicrophone();
+
         if (null == avRoom) {
             Log.i(TAG, "stopRoom, room is not created.");
             return;
@@ -248,6 +255,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mVideoCapture.destroyCamera();
         stopImporter();
         if (null != avRoom) {
             if (null != mFakeVideoCapturer) {

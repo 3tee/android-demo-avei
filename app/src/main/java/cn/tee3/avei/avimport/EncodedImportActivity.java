@@ -94,14 +94,6 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
                 }
                 if (null == mFakeVideoCapturer) {
                     mFakeVideoCapturer = FakeVideoCapturer.Create(sourceFVC_listener, FakeVideoCapturer.FourccType.ft_H264, false);
-                    //发布改虚拟Camera
-                    int ret1 = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
-                    if (0 != ret1) {
-                        Log.e(TAG, "publishLocalCamera failed. ret=" + ret1);
-                        logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret1);
-                    } else {
-                        Log.i(TAG, "publishLocalCamera. ret=" + ret1);
-                    }
                 }
             }
         });
@@ -157,6 +149,15 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
     private byte[] data = new byte[0];//currData[4]=104、103、6、101时需要拼接后进行上传
 
     private void startImporter() {
+        //发布虚拟Camera
+        int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
+        if (0 != ret) {
+            Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
+            logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
+        } else {
+            Log.i(TAG, "publishLocalCamera. ret=" + ret);
+        }
+
         //视频导入
         is = getResources().openRawResource(R.raw.test);
         logView.addImportantLog("开始导入音视频");
@@ -319,6 +320,9 @@ public class EncodedImportActivity extends Activity implements View.OnClickListe
      * 停止导入
      */
     private void stopImporter() {
+        //取消发布虚拟Camera
+        avRoom.mvideo.unpublishLocalCamera(mFakeCam.getId());
+
         if (null == avRoom) {
             Log.i(TAG, "stopRoom, room is not created.");
             return;

@@ -124,6 +124,9 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                 cAdapter = new CamerasAdapter(AveiApp.getContextObject(), mPublishedCameras);
                 lvCameras.setAdapter(cAdapter);
                 cAdapter.notifyDataSetChanged();
+                if (mPublishedCameras == null || mPublishedCameras.size() == 0) {
+                    logView.addVeryImportantLog("请用幸会加入此房间并打开摄像头，协助测试");
+                }
             }
         });
         check_ret(ret);
@@ -156,16 +159,19 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
             boolean isRepeat = mPublishedCameras.contains(camera);
             if (!isRepeat) {
                 mPublishedCameras.add(camera);
-                logView.addNormalLog( ownerName + "开启摄像头");
+                logView.addNormalLog(ownerName + "开启摄像头");
                 cAdapter.notifyDataSetChanged();
             }
         } else {//房间有摄像头离开,从列表中移除列表
             for (int i = 0; i < mPublishedCameras.size(); i++) {
                 if (mPublishedCameras.get(i).getId().equals(camera.getId())) {
                     mPublishedCameras.remove(i);
-                    logView.addNormalLog( ownerName + "关闭摄像头");
+                    logView.addNormalLog(ownerName + "关闭摄像头");
                     cAdapter.notifyDataSetChanged();
                 }
+            }
+            if (mPublishedCameras == null || mPublishedCameras.size() == 0) {
+                logView.addVeryImportantLog("请用幸会加入此房间并打开摄像头，协助测试");
             }
         }
     }
@@ -184,8 +190,8 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
 
     private Runnable messageRunnable = new Runnable() {
         public void run() {
-            logView.addDetailsLog( "已导出视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
-            logView.addDetailsLog( "已导出音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
+            logView.addDetailsLog("已导出视频" + videoFrameNum + "帧," + FilesUtils.FormetFileSize(videoDataSize));
+            logView.addDetailsLog("已导出音频" + audioFrameNum + "帧," + FilesUtils.FormetFileSize(audioDataSize));
             mHandler.postDelayed(messageRunnable, 3000);
         }
     };
@@ -261,9 +267,9 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
             maudioUserId = mRoom.mvideo.getOwnerId(mvideoDeviceId);
 
             String selectOwner = mRoom.mvideo.getUserName(maudioUserId);
-            logView.addNormalLog( "您已选择" + selectOwner + "的视频");
+            logView.addNormalLog("您已选择" + selectOwner + "的视频");
             if (audioEIType == AVExportRoom.AudioOptions.record_one_by_video) {
-                logView.addNormalLog( "您已选择" + selectOwner + "的音频");
+                logView.addNormalLog("您已选择" + selectOwner + "的音频");
             }
             //选中视频后，改变改栏底色
             Constants.SELECT_CAMERA_ID = mvideoDeviceId;
@@ -281,7 +287,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
         if (type == FunctionModel.RECORD) {
             switch (options) {
                 case stop:
-                    logView.addImportantLog( "停止录制");
+                    logView.addImportantLog("停止录制");
                     tvRecord.setText("开始录制");
                     tvFileList.setClickable(true);
                     tvExport.setClickable(true);
@@ -292,7 +298,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                     lvCameras.setEnabled(true);
                     break;
                 case start:
-                    logView.addImportantLog( "开始录制");
+                    logView.addImportantLog("开始录制");
                     tvRecord.setText("停止录制");
                     tvFileList.setClickable(false);
                     tvExport.setClickable(false);
@@ -306,7 +312,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
         } else if (type == FunctionModel.EXPORT) {
             switch (options) {
                 case stop:
-                    logView.addImportantLog( "停止导出");
+                    logView.addImportantLog("停止导出");
                     tvExport.setText("开始导出");
                     tvFileList.setClickable(true);
                     tvRecord.setClickable(true);
@@ -368,22 +374,22 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
             case R.id.rb_audio_no:
                 audioEIType = AVExportRoom.AudioOptions.record_no_audio;
 
-                logView.addNormalLog( "您已选择不录制房间所有的音频");
+                logView.addNormalLog("您已选择不录制房间所有的音频");
                 break;
             case R.id.rb_audio_one:
                 audioEIType = AVExportRoom.AudioOptions.record_one_by_video;
                 if (StringUtils.isNotEmpty(maudioUserId)) {
                     String selectOwner = mRoom.mvideo.getUserName(maudioUserId);
-                    logView.addNormalLog( "您已选择" + selectOwner + "的音频");
+                    logView.addNormalLog("您已选择" + selectOwner + "的音频");
                 }
                 break;
             case R.id.rb_audio_without_me:
                 audioEIType = AVExportRoom.AudioOptions.record_all_withoutme;
-                logView.addNormalLog( "您已选择房间内除自己外的音频");
+                logView.addNormalLog("您已选择房间内除自己外的音频");
                 break;
             case R.id.rb_audio_all:
                 audioEIType = AVExportRoom.AudioOptions.record_all_inroom;
-                logView.addNormalLog( "您已选择房间内所有用户的音频");
+                logView.addNormalLog("您已选择房间内所有用户的音频");
                 break;
             default:
                 break;

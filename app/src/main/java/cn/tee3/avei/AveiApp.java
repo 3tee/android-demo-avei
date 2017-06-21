@@ -67,7 +67,7 @@ public class AveiApp extends Application implements AVDEngine.Listener {
     static boolean isFolderExists(String strFolder) {
         File file = new File(strFolder);
         if (!file.exists()) {
-            if (file.mkdir()) {
+            if (file.mkdirs()) {
                 return true;
             } else {
                 return false;

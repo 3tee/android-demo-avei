@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.tee3.avei">
+    package="cn.tee3.avei"
+    android:versionCode="100"
+    android:versionName="1.0.0">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.REORDER_TASKS" />
@@ -10,7 +12,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -29,6 +30,7 @@
         android:theme="@style/default_ui_bg">
         <activity
             android:name="cn.tee3.avei.main.MainActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,18 +40,23 @@
         </activity>
         <activity
             android:name=".export.LocalRecordAndExportActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
             android:name=".avimport.RawDataImportActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
             android:name=".avimport.EncodedImportActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
             android:name=".avimport.AVImporterDemoActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
             android:name=".avimport.RtspClientImportActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
             android:name=".files.FileListActivity"

@@ -95,6 +95,8 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
         mFakeCam.setPublishedQualities(pubOptions);
 
         startUpVideo(roomId);
+
+        mRtspclient.start(AppKey.rtsp_uri, AppKey.rtsp_username, AppKey.rtsp_password);
     }
 
 
@@ -112,20 +114,10 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
                 }
                 if (null == mFakeAudioCapturer) {
                     mFakeAudioCapturer = FakeAudioCapturer.instance();
-                    //启用麦克风
-                    mFakeAudioCapturer.enable(true);
-                    avRoom.maudio.openMicrophone();
-
                 }
                 mRtspclient.setAudioCapture(mFakeAudioCapturer);
                 if (null == mFakeVideoCapturer) {
                     mFakeVideoCapturer = FakeVideoCapturer.Create(sourceFVC_listener, FakeVideoCapturer.FourccType.ft_H264, false);
-                    //发布改虚拟Camera
-                    int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
-                    if (0 != ret) {
-                        Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
-                        logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
-                    }
                     mRtspclient.setVideoCapture(mFakeVideoCapturer);
                 }
             }
@@ -178,7 +170,16 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
     }
 
     private void startImporter() {
-        mRtspclient.start(AppKey.rtsp_uri, "admin", "Hik12345");
+        //发布虚拟Camera
+        int ret = avRoom.mvideo.publishLocalCamera(mFakeCam, mFakeVideoCapturer);
+        if (0 != ret) {
+            Log.e(TAG, "publishLocalCamera failed. ret=" + ret);
+            logView.addVeryImportantLog("发布虚拟摄像头失败：ErrorCode=" + ret);
+        }
+        //启用麦克风
+        mFakeAudioCapturer.enable(true);
+        avRoom.maudio.openMicrophone();
+
         logView.addImportantLog("开始导入音视频");
         logView.addVeryImportantLog("请用幸会加入此房间查看导入的音视频");
         isImport = true;
@@ -215,16 +216,20 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
     };
 
     private void stopImporter() {
+        //取消发布虚拟Camera
+        avRoom.mvideo.unpublishLocalCamera(mFakeCam.getId());
+        //关闭麦克风//此处不设置 mFakeAudioCapturer.enable也不影响
+        mFakeAudioCapturer.enable(false);
+        avRoom.maudio.closeMicrophone();
+
         if (null == avRoom) {
             Log.i(TAG, "stopRoom, room is not created.");
             return;
         }
-        mRtspclient.stop();
         logView.addImportantLog("停止导入音视频");
         Log.i(TAG, "stopImporter, begin...");
         //视频停止导入
         isImport = false;
-        mRtspclient.stop();
 
         //计时器清除
         mTimerUtils.clearTimer();
@@ -245,6 +250,7 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mRtspclient.stop();
         stopImporter();
         if (null != avRoom) {
             if (null != mFakeVideoCapturer) {

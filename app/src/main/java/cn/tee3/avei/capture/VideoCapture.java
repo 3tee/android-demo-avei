@@ -41,15 +41,17 @@ public class VideoCapture implements PreviewCallback {
             return 270;
         }
     }
+
     public boolean isFrontCamera() {
         return mCameraFacing == CAMERA_FACING_FRONT;
     }
+
     public interface OnPreviewFrameCallback {
         void onPreviewFrameCaptured(int width, int height, byte[] data);
     }
 
     public void openCamera(int cameraFacing, int width, int height, int orientation) {
-        Log.i(TAG, "openCamera, cameraFacing="+cameraFacing+",w="+width+",h="+height+",orientation="+orientation);
+        Log.i(TAG, "openCamera, cameraFacing=" + cameraFacing + ",w=" + width + ",h=" + height + ",orientation=" + orientation);
         if (mCamera != null) {
             return;
         }
@@ -170,6 +172,12 @@ public class VideoCapture implements PreviewCallback {
         }
         Log.i(TAG, "stopPreview");
         mCamera.stopPreview();
+    }
+
+    public void destroyCamera() {
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
     }
 
     private class CameraSurfaceCallback implements SurfaceHolder.Callback {
