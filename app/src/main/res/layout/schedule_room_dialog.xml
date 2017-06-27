@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="230dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/round_corner_gray"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="14dp"
+        android:text="该房间暂未被安排。新建房间，请点击右上角图标"
+        android:drawableRight="@mipmap/schedule_room"
+        android:textColor="#666666"
+        android:textSize="14sp"/>
+
+</LinearLayout>

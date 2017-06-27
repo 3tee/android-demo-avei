@@ -1,4 +1,4 @@
-package cn.tee3.avei.utils;
+package cn.tee3.avei.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

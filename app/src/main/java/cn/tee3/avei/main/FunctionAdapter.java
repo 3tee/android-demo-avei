@@ -60,10 +60,10 @@ public class FunctionAdapter extends BaseAdapter {
         tHolder.tvFunctionName = (TextView) curView.findViewById(R.id.tv_function_name);
         tHolder.tvFunctionName.setText(function.getName());
 
-        if (Constants.SELECT_FUNCTION_NAME.equals(function.getName())) {
+        if (Constants.SELECT_FUNCTION.getName().equals(function.getName())) {
             curView.setBackgroundResource(R.color.itemSelectBg);
         } else {
-            if (function.getType() == FunctionModel.TITLE) {
+            if (function.getFunctionType() == FunctionModel.FunctionType.TITLE) {
                 tHolder.tvFunctionName.setTextColor(Color.parseColor("#FF0000"));
             } else {
                 tHolder.tvFunctionName.setTextColor(Color.parseColor("#333333"));

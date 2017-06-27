@@ -1,19 +1,23 @@
 package cn.tee3.avei.model;
 
+import android.app.Activity;
+
 /**
  * 功能model
  * Created by shengf on 2017/6/13.
  */
 
 public class FunctionModel {
-    public static final int TITLE = 0;
-
-    public static final int RECORD = 1;//录制功能
-    public static final int EXPORT = 2;//导出功能
-    public static final int AV_IMPORT = 3;//简单导入功能
-    public static final int RAW_DATA_IMPORT = 4;//原始数据导入功能
-    public static final int ENCODED_IMPORT = 5;//编码数据导入功能
-    public static final int RTSP_IMPORT = 6;//rtsp数据导入功能
+    //功能类型
+    public static enum FunctionType {
+        TITLE,
+        RECORD,//录制功能
+        EXPORT,//导出功能
+        AV_IMPORT,//简单导入功能
+        RAW_DATA_IMPORT,//原始数据导入功能
+        ENCODED_IMPORT,//编码数据导入功能
+        RTSP_IMPORT//rtsp数据导入功能
+    }
 
     //功能状态
     public static enum FunctionStateOptions {
@@ -21,16 +25,26 @@ public class FunctionModel {
         stop//暂停
     }
 
-    private int type;
+
+    private FunctionType functionType;
     private String name;
     private String describe;
+    private Activity mActivity;
 
-    public int getType() {
-        return type;
+    public Activity getmActivity() {
+        return mActivity;
     }
 
-    public void setType(int type) {
-        this.type = type;
+    public void setmActivity(Activity mActivity) {
+        this.mActivity = mActivity;
+    }
+
+    public FunctionType getFunctionType() {
+        return functionType;
+    }
+
+    public void setFunctionType(FunctionType functionType) {
+        this.functionType = functionType;
     }
 
     public String getName() {

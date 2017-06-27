@@ -3,14 +3,21 @@ package cn.tee3.avei.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
+import cn.tee3.avd.AVDEngine;
+import cn.tee3.avd.RoomInfo;
+import cn.tee3.avei.AveiApp;
 import cn.tee3.avei.Constants;
 import cn.tee3.avei.R;
 import cn.tee3.avei.avimport.EncodedImportActivity;
@@ -20,6 +27,7 @@ import cn.tee3.avei.avimport.RtspClientImportActivity;
 import cn.tee3.avei.export.LocalRecordAndExportActivity;
 import cn.tee3.avei.model.FunctionModel;
 import cn.tee3.avei.utils.StringUtils;
+import cn.tee3.avei.view.AveiDialog;
 
 /**
  * 主界面（起始页）
@@ -27,7 +35,7 @@ import cn.tee3.avei.utils.StringUtils;
  * Created by shengf on 2017/6/3.
  */
 
-public class MainActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener {
+public class MainActivity extends Activity implements View.OnClickListener, AdapterView.OnItemClickListener, AveiApp.RoomListener {
     private static final String TAG = "MainActivity";
 
     private ListView lvFunctions;//功能列表
@@ -36,7 +44,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
     private TextView tvExplain;//模块说明
     private TextView tvJoinroom;//加入房间
     private EditText etRoomid;//房间Id
-    private int functionType;
+    private ImageView ivScheduleRoom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,58 +53,62 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
         initFunction();
         initView();
         initData();
+        //设置房间查询、安排回调
+        ((AveiApp) getApplication()).setRoomListener(this);
+    }
+
+    //房间查询、安排回调
+    @Override
+    public void RoomEvent(AveiApp.RoomEventType roomEventType, int ret, String roomIdResult) {
+        if (roomEventType == AveiApp.RoomEventType.GetRoomResult) {//查询房间返回
+            if (ret == 0) {
+                Intent intent = new Intent(MainActivity.this, Constants.SELECT_FUNCTION.getmActivity().getClass());
+                intent.putExtra("roomId", roomIdResult);
+                startActivity(intent);
+            } else {
+                AveiDialog.ScheduleRoomDialog(this);
+                Log.e(TAG, "GetRoomResult failed:" + ret);
+            }
+        } else {//安排房间返回
+            if (ret == 0) {
+                Intent intent = new Intent(MainActivity.this, Constants.SELECT_FUNCTION.getmActivity().getClass());
+                intent.putExtra("roomId", roomIdResult);
+                startActivity(intent);
+            } else {
+                Toast.makeText(MainActivity.this, "安排房间失败 ErrorCode:" + ret, Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "ScheduleRoomResult failed:" + ret);
+            }
+        }
     }
 
     @Override
     public void onClick(View v) {
+        String roomId = "";
+        roomId = etRoomid.getText().toString().trim();
+        if (StringUtils.isEmpty(roomId)) {
+            roomId = "r2";
+        }
         switch (v.getId()) {
             case R.id.tv_joinroom:
-                String roomId = etRoomid.getText().toString().trim();
-                if (StringUtils.isEmpty(roomId)) {
-                    roomId = "r3355";
-                }
-                switch (functionType) {
-                    case FunctionModel.RECORD://录制和导出
-                        Intent intentRecord = new Intent(this, LocalRecordAndExportActivity.class);
-                        intentRecord.putExtra("roomId", roomId);
-                        startActivity(intentRecord);
-                        break;
-                    case FunctionModel.EXPORT://录制和导出
-                        Intent intentExport = new Intent(this, LocalRecordAndExportActivity.class);
-                        intentExport.putExtra("roomId", roomId);
-                        startActivity(intentExport);
-                        break;
-                    case FunctionModel.AV_IMPORT://简单导入
-                        Intent intentSimpleImport = new Intent(this, AVImporterDemoActivity.class);
-                        intentSimpleImport.putExtra("roomId", roomId);
-                        startActivity(intentSimpleImport);
-                        break;
-                    case FunctionModel.RAW_DATA_IMPORT://原始数据导入
-                        Intent intentRawDataImport = new Intent(this, RawDataImportActivity.class);
-                        intentRawDataImport.putExtra("roomId", roomId);
-                        startActivity(intentRawDataImport);
-                        break;
-                    case FunctionModel.ENCODED_IMPORT://编码数据导入
-                        Intent intentCodedDataImport = new Intent(this, EncodedImportActivity.class);
-                        intentCodedDataImport.putExtra("roomId", roomId);
-                        startActivity(intentCodedDataImport);
-                        break;
-                    case FunctionModel.RTSP_IMPORT://RTSP导入
-                        Intent intentRTSPImport = new Intent(this, RtspClientImportActivity.class);
-                        intentRTSPImport.putExtra("roomId", roomId);
-                        startActivity(intentRTSPImport);
-                        break;
-                    default:
-                        break;
-                }
+                //查询房间是否存在
+                AVDEngine.instance().getRoomByRoomId(roomId);
+                break;
+            case R.id.iv_schedule_room:
+                //安排房间
+                RoomInfo roomInfo = new RoomInfo(UUID.randomUUID().toString(), RoomInfo.RoomMode_mcu, 5);
+//                RoomInfo roomInfo = new RoomInfo(roomId, RoomInfo.RoomMode_mcu, 5);
+                AVDEngine.instance().scheduleRoom(roomInfo);
+                break;
+            default:
                 break;
         }
     }
 
     public void initView() {
         etRoomid = (EditText) findViewById(R.id.et_roomid);
+        ivScheduleRoom = (ImageView) findViewById(R.id.iv_schedule_room);
         etRoomid.setVisibility(View.VISIBLE);
-
+        ivScheduleRoom.setVisibility(View.VISIBLE);
         tvExplain = (TextView) findViewById(R.id.tv_explain);
         tvJoinroom = (TextView) findViewById(R.id.tv_joinroom);
         lvFunctions = (ListView) findViewById(R.id.lv_functions);
@@ -106,6 +118,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
         lvFunctions.setAdapter(fAdapter);
         fAdapter.notifyDataSetChanged();
 
+        ivScheduleRoom.setOnClickListener(this);
         tvJoinroom.setOnClickListener(this);
     }
 
@@ -116,59 +129,70 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
             FunctionModel functionModel = new FunctionModel();
             switch (i) {
                 case 0:
-                    functionModel.setType(FunctionModel.TITLE);
+                    functionModel.setFunctionType(FunctionModel.FunctionType.TITLE);
                     functionModel.setName("音视频导入");
                     functionModel.setDescribe("");
                     break;
                 case 1:
-                    functionModel.setType(FunctionModel.AV_IMPORT);
+                    AVImporterDemoActivity avImporterDemoActivity = new AVImporterDemoActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.AV_IMPORT);
                     functionModel.setName(getResources().getString(R.string.simple_import));
                     functionModel.setDescribe(getResources().getString(R.string.simple_import_des));
+                    functionModel.setmActivity(avImporterDemoActivity);
                     break;
                 case 2:
-                    functionModel.setType(FunctionModel.RAW_DATA_IMPORT);
+                    RawDataImportActivity rawDataImportActivity = new RawDataImportActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.RAW_DATA_IMPORT);
                     functionModel.setName(getResources().getString(R.string.raw_data_import));
                     functionModel.setDescribe(getResources().getString(R.string.raw_data_import_des));
+                    functionModel.setmActivity(rawDataImportActivity);
                     break;
                 case 3:
-                    functionModel.setType(FunctionModel.ENCODED_IMPORT);
+                    EncodedImportActivity encodedImportActivity = new EncodedImportActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.ENCODED_IMPORT);
                     functionModel.setName(getResources().getString(R.string.coded_data_import));
                     functionModel.setDescribe(getResources().getString(R.string.coded_data_import_des));
+                    functionModel.setmActivity(encodedImportActivity);
                     break;
                 case 4:
-                    functionModel.setType(FunctionModel.RTSP_IMPORT);
+                    RtspClientImportActivity rtspClientImportActivity = new RtspClientImportActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.RTSP_IMPORT);
                     functionModel.setName(getResources().getString(R.string.rtsp_data_import));
                     functionModel.setDescribe(getResources().getString(R.string.rtsp_data_import_des));
+                    functionModel.setmActivity(rtspClientImportActivity);
                     break;
                 case 5:
-                    functionModel.setType(FunctionModel.TITLE);
+                    functionModel.setFunctionType(FunctionModel.FunctionType.TITLE);
                     functionModel.setName("本地音视频录制和导出");
                     functionModel.setDescribe("");
                     break;
                 case 6:
-                    functionModel.setType(FunctionModel.RECORD);
+                    LocalRecordAndExportActivity localRecordActivity = new LocalRecordAndExportActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.RECORD);
                     functionModel.setName(getResources().getString(R.string.local_record));
                     functionModel.setDescribe(getResources().getString(R.string.local_record_des));
+                    functionModel.setmActivity(localRecordActivity);
                     break;
                 case 7:
-                    functionModel.setType(FunctionModel.EXPORT);
+                    LocalRecordAndExportActivity ExportActivity = new LocalRecordAndExportActivity();
+                    functionModel.setFunctionType(FunctionModel.FunctionType.EXPORT);
                     functionModel.setName(getResources().getString(R.string.export));
                     functionModel.setDescribe(getResources().getString(R.string.export_des));
+                    functionModel.setmActivity(ExportActivity);
                     break;
             }
             functionModels.add(functionModel);
         }
         //默认选中第一个功能
-        Constants.SELECT_FUNCTION_NAME = functionModels.get(1).getName();
+        Constants.SELECT_FUNCTION = functionModels.get(1);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         FunctionModel functionModel = functionModels.get(position);
-        if (FunctionModel.TITLE != functionModel.getType()) {//非标题项
+        if (FunctionModel.FunctionType.TITLE != functionModel.getFunctionType()) {//非标题项
             tvExplain.setText(functionModel.getDescribe());
-            functionType = functionModel.getType();
-            Constants.SELECT_FUNCTION_NAME = functionModel.getName();
+            Constants.SELECT_FUNCTION = functionModel;
             fAdapter.notifyDataSetChanged();
         }
     }
@@ -178,7 +202,6 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
      * 默认选中第一个功能
      */
     private void initData() {
-        functionType = functionModels.get(1).getType();
         tvExplain.setText(functionModels.get(1).getDescribe());
     }
 }

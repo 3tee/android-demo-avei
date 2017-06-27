@@ -19,7 +19,7 @@ import cn.tee3.avd.Room;
 import cn.tee3.avd.VideoOptions;
 import cn.tee3.avei.R;
 import cn.tee3.avei.avroom.AVRoom;
-import cn.tee3.avei.utils.EventLogView;
+import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.TimerUtils;
 

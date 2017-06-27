@@ -28,7 +28,7 @@ import cn.tee3.avei.avroom.AVExportRoom;
 import cn.tee3.avei.avroom.AVRoom;
 import cn.tee3.avei.files.FileListActivity;
 import cn.tee3.avei.model.FunctionModel;
-import cn.tee3.avei.utils.EventLogView;
+import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.StringUtils;
 import cn.tee3.avei.utils.TimerUtils;
@@ -55,7 +55,6 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
     private AVExportRoom mRoom;
     private List<MVideo.Camera> mPublishedCameras;//视频摄像头信息列表
     private CamerasAdapter cAdapter;
-    private AVExportRoom.AudioOptions audioEIType = AVExportRoom.AudioOptions.record_one_by_video;//录制导出时所选的音频参数,默认选中一个用户
     private TimerUtils mTimerUtils;
 
     private String mvideoDeviceId = "";//录制所选择视频设备Id
@@ -64,6 +63,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
     private int audioFrameNum = 0;//音频上传的帧数（次数）
     private long videoDataSize = 0;//已上传视频数据的大小
     private long audioDataSize = 0;//已上传音频文件的大小
+    private AVExportRoom.AudioOptions audioEIType = AVExportRoom.AudioOptions.record_one_by_video;//录制导出时所选的音频参数,默认选中一个用户
 
     private Handler mHandler = new Handler();
 
@@ -79,13 +79,13 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
         tvTitle.setText("房间号：" + roomId);
 
         transView = findViewById(R.id.trans_view);
-
         logView = (EventLogView) findViewById(R.id.event_view);
         tvRecord = (TextView) findViewById(R.id.tv_record);
         tvExport = (TextView) findViewById(R.id.tv_export);
         lvCameras = (ListView) findViewById(R.id.lv_cameras);
         tvRecordExportTime = (TextView) findViewById(R.id.tv_record_export_time);
         tvFileList = (TextView) findViewById(R.id.tv_filelist);
+        rgAudioSelect = (RadioGroup) findViewById(R.id.rg_audio_select);
         tvRecord.setTag(0);
         tvExport.setTag(0);
 
@@ -93,11 +93,10 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
         tvExport.setOnClickListener(this);
         tvFileList.setOnClickListener(this);
         lvCameras.setOnItemClickListener(this);
+        rgAudioSelect.setOnCheckedChangeListener(this);
 
         mTimerUtils = new TimerUtils(tvRecordExportTime);
 
-        rgAudioSelect = (RadioGroup) findViewById(R.id.rg_audio_select);
-        rgAudioSelect.setOnCheckedChangeListener(this);
         startUpVideo(roomId);//加入房间
     }
 
@@ -168,6 +167,9 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                     mPublishedCameras.remove(i);
                     logView.addNormalLog(ownerName + "关闭摄像头");
                     cAdapter.notifyDataSetChanged();
+                    if (Constants.SELECT_CAMERA_ID.equals(camera.getId())) {
+                        Constants.SELECT_CAMERA_ID = "";
+                    }
                 }
             }
             if (mPublishedCameras == null || mPublishedCameras.size() == 0) {
@@ -205,11 +207,11 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                 if (checkLocalRecordValid()) {
                     if (recordTag == 0) {
                         mTimerUtils.updateTimer();//开始计时
-                        updateUI(FunctionModel.RECORD, FunctionModel.FunctionStateOptions.start);
+                        updateUI(FunctionModel.FunctionType.RECORD, FunctionModel.FunctionStateOptions.start);
                         mRoom.startLocalRecord(getLocalFile(), mvideoDeviceId, maudioUserId, audioEIType);
                     } else {
                         stopExport();
-                        updateUI(FunctionModel.RECORD, FunctionModel.FunctionStateOptions.stop);
+                        updateUI(FunctionModel.FunctionType.RECORD, FunctionModel.FunctionStateOptions.stop);
                         mRoom.stopRecordOrExport();//停止录制或导出
                     }
                 }
@@ -221,11 +223,11 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                     if (exportTag == 0) {
                         mHandler.postDelayed(messageRunnable, 0);
                         mTimerUtils.updateTimer();//开始计时
-                        updateUI(FunctionModel.EXPORT, FunctionModel.FunctionStateOptions.start);
+                        updateUI(FunctionModel.FunctionType.EXPORT, FunctionModel.FunctionStateOptions.start);
                         mRoom.startLocalExport(this, mvideoDeviceId, maudioUserId, audioEIType);
                     } else {
                         stopExport();
-                        updateUI(FunctionModel.EXPORT, FunctionModel.FunctionStateOptions.stop);
+                        updateUI(FunctionModel.FunctionType.EXPORT, FunctionModel.FunctionStateOptions.stop);
                         mRoom.stopRecordOrExport();//停止录制或导出
                     }
                 }
@@ -280,11 +282,11 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
     /**
      * 跟新UI
      *
-     * @param type    record：录制；export：导出
+     * @param type    录制/导出
      * @param options start：正在录制；stop：完成
      */
-    public void updateUI(int type, FunctionModel.FunctionStateOptions options) {
-        if (type == FunctionModel.RECORD) {
+    public void updateUI(FunctionModel.FunctionType type, FunctionModel.FunctionStateOptions options) {
+        if (type == FunctionModel.FunctionType.RECORD) {
             switch (options) {
                 case stop:
                     logView.addImportantLog("停止录制");
@@ -309,7 +311,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                     lvCameras.setEnabled(false);
                     break;
             }
-        } else if (type == FunctionModel.EXPORT) {
+        } else if (type == FunctionModel.FunctionType.EXPORT) {
             switch (options) {
                 case stop:
                     logView.addImportantLog("停止导出");
@@ -351,15 +353,13 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //取消事件注册
-        Log.i(TAG, "onDestory");
-
         if (null != mRoom) {
             stopExport();
             mRoom.dispose();
             //退出房间时，已选中视频设为""
             Constants.SELECT_CAMERA_ID = "";
         }
+        Log.i(TAG, "onDestory");
     }
 
     /**
@@ -373,7 +373,6 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
         switch (checkedId) {
             case R.id.rb_audio_no:
                 audioEIType = AVExportRoom.AudioOptions.record_no_audio;
-
                 logView.addNormalLog("您已选择不录制房间所有的音频");
                 break;
             case R.id.rb_audio_one:

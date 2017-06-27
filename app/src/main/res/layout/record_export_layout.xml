@@ -8,13 +8,13 @@
         android:id="@+id/title_bar"
         layout="@layout/public_title_bar" />
 
-    <cn.tee3.avei.utils.EventLogView
+    <cn.tee3.avei.view.EventLogView
         android:id="@+id/event_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-    </cn.tee3.avei.utils.EventLogView>
+    </cn.tee3.avei.view.EventLogView>
 
     <View
         android:layout_width="match_parent"

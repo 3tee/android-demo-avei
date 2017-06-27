@@ -18,7 +18,7 @@
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
-            android:text="demo_avei"
+            android:text="demo_svrc"
             android:textColor="#ffffff"
             android:textSize="17sp" />
 
@@ -38,15 +38,27 @@
             android:id="@+id/et_roomid"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="16dp"
+            android:layout_below="@+id/tv_title"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/iv_schedule_room"
             android:background="@null"
             android:gravity="center_vertical"
-            android:hint="房间号：r3355"
+            android:hint="房间号：r2"
             android:singleLine="true"
             android:text=""
             android:textColor="#cc0000"
             android:textColorHint="#cc0000"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/iv_schedule_room"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="16dp"
+            android:background="@mipmap/schedule_room"
+            android:gravity="center_vertical"
             android:visibility="gone" />
     </RelativeLayout>
 

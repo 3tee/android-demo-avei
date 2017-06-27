@@ -2,7 +2,6 @@ package cn.tee3.avei.avimport;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -17,7 +16,7 @@ import cn.tee3.avei.PreviewSurface;
 import cn.tee3.avei.R;
 import cn.tee3.avei.capture.AudioCaptureThread;
 import cn.tee3.avei.capture.VideoCapture;
-import cn.tee3.avei.utils.EventLogView;
+import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.TimerUtils;
 

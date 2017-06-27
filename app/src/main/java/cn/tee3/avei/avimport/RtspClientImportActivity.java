@@ -22,7 +22,7 @@ import cn.tee3.avei.R;
 import cn.tee3.avei.avroom.AVRoom;
 import cn.tee3.avei.capture.AudioCaptureThread;
 import cn.tee3.avei.utils.AppKey;
-import cn.tee3.avei.utils.EventLogView;
+import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.TimerUtils;
 
@@ -96,7 +96,7 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
 
         startUpVideo(roomId);
 
-        mRtspclient.start(AppKey.rtsp_uri, AppKey.rtsp_username, AppKey.rtsp_password);
+        mRtspclient.start(AppKey.rtsp_uri, "admin", "Hik12345");
     }
 
 

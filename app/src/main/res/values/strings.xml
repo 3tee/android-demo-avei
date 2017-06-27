@@ -1,15 +1,15 @@
 <resources>
-<string name="app_name">demo_avei</string>
-<string name="simple_import">\t\t\t\t简易音视频导入接口</string>
-<string name="simple_import_des">\t\t\t\t封装了引擎初始化，加房间，导入编码前后音视频的简易接口，方便只需要音视频导入房间的设备使用\n请参考类AVImporterDemoActivity</string>
-<string name="raw_data_import">\t\t\t\t原始数据音频pcm-视频yuv</string>
-<string name="raw_data_import_des">\t\t\t\t房间中以本用户的虚拟设备导入pcm的音频及yuv的视频流，其他用户可查看或收听导入的音视频（与本用户正常发布音视频一致）\n请参考类EncodedImportActivity</string>
-<string name="coded_data_import">\t\t\t\t编码数据音频aac-视频h264</string>
-<string name="coded_data_import_des">\t\t\t\t房间中以本用户的虚拟设备导入aac的音频及h264的视频流，其他用户可查看或收听导入的音视频（与本用户正常发布音视频一致）\n请参考类RawDataImportActivity</string>
-<string name="rtsp_data_import">\t\t\t\tRTSP客户端导入接口</string>
-<string name="rtsp_data_import_des">\t\t\t\t客户端连接RTSP服务器（或IPC）拉音视频流，可做本地解码播放，可以编码数据或者解码后数据导入房间\n请参考类RtspClientImportActivity</string>
-<string name="local_record">\t\t\t\t音视频录制成文件</string>
-<string name="local_record_des">\t\t\t\t房间中已经发布的音视频可通过接口在本地录制成mp4(h264+aac)和webm(vp8+opus)类型的音视频标准文件\n请参考类LocalRecordAndExportActivity</string>
-<string name="export">\t\t\t\t音视频解码前导出</string>
-<string name="export_des">\t\t\t\t房间中已经发布的音视频可通过接口在本地将编码的音视频数据导出由应用层做自由处理\n请参考类LocalRecordAndExportActivity</string>
+    <string name="app_name">demo_avei</string>
+    <string name="simple_import">\t\t\t\t简易音视频导入接口</string>
+    <string name="simple_import_des">\t\t\t\t封装了引擎初始化，加房间，导入编码前后音视频的简易接口，方便只需要音视频导入房间的设备使用\n请参考类AVImporterDemoActivity</string>
+    <string name="raw_data_import">\t\t\t\t原始数据音频pcm-视频yuv</string>
+    <string name="raw_data_import_des">\t\t\t\t房间中以本用户的虚拟设备导入pcm的音频及yuv的视频流，其他用户可查看或收听导入的音视频（与本用户正常发布音视频一致）\n请参考类RawDataImportActivity</string>
+    <string name="coded_data_import">\t\t\t\t编码数据音频aac-视频h264</string>
+    <string name="coded_data_import_des">\t\t\t\t房间中以本用户的虚拟设备导入aac的音频及h264的视频流，其他用户可查看或收听导入的音视频（与本用户正常发布音视频一致）\n请参考类EncodedImportActivity</string>
+    <string name="rtsp_data_import">\t\t\t\tRTSP客户端导入接口</string>
+    <string name="rtsp_data_import_des">\t\t\t\t客户端连接RTSP服务器（或IPC）拉音视频流，可做本地解码播放，可以编码数据或者解码后数据导入房间\n请参考类RtspClientImportActivity</string>
+    <string name="local_record">\t\t\t\t音视频录制成文件</string>
+    <string name="local_record_des">\t\t\t\t房间中已经发布的音视频可通过接口在本地录制成mp4(h264+aac)和webm(vp8+opus)类型的音视频标准文件\n请参考类LocalRecordAndExportActivity</string>
+    <string name="export">\t\t\t\t音视频解码前导出</string>
+    <string name="export_des">\t\t\t\t房间中已经发布的音视频可通过接口在本地将编码的音视频数据导出由应用层做自由处理\n请参考类LocalRecordAndExportActivity</string>
 </resources>

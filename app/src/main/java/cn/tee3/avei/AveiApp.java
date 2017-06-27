@@ -22,6 +22,15 @@ import cn.tee3.avei.utils.AppKey;
 public class AveiApp extends Application implements AVDEngine.Listener {
     private static final String TAG = "LawPush4AndroidPad";
     private static Context context;
+    private RoomListener rListener;
+
+    public interface RoomListener {
+        void RoomEvent(RoomEventType roomEventType, int ret, String roomIdResult);
+    }
+
+    public void setRoomListener(RoomListener rListener) {
+        this.rListener = rListener;
+    }
 
     @Override
     public void onCreate() {
@@ -45,6 +54,11 @@ public class AveiApp extends Application implements AVDEngine.Listener {
     //返回
     public static Context getContextObject() {
         return context;
+    }
+
+    public static enum RoomEventType {
+        GetRoomResult,//查询房间返回
+        ScheduleRoomResult//安排房间返回
     }
 
     @Override
@@ -89,6 +103,7 @@ public class AveiApp extends Application implements AVDEngine.Listener {
     @Override
     public void onGetRoomResult(int result, RoomInfo roomInfo) {
         Log.i(TAG, "onScheduleRoomResult,result=" + result + ",roomId=" + roomInfo.toString());
+        rListener.RoomEvent(RoomEventType.GetRoomResult, result, roomInfo.getRoomId());
     }
 
     @Override
@@ -99,6 +114,7 @@ public class AveiApp extends Application implements AVDEngine.Listener {
     @Override
     public void onScheduleRoomResult(int result, String roomId) {
         Log.i(TAG, "onScheduleRoomResult,result=" + result + ",roomId=" + roomId);
+        rListener.RoomEvent(RoomEventType.ScheduleRoomResult, result, roomId);
     }
 
     @Override
