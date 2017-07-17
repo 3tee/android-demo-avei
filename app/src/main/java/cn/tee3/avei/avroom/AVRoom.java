@@ -19,7 +19,7 @@ import cn.tee3.avei.utils.StringUtils;
 
 public class AVRoom {
     private static final String TAG = "AVRoom";
-    protected Room room;
+    public Room room;
     public MAudio maudio;
     public MVideo mvideo;
     protected int callret;

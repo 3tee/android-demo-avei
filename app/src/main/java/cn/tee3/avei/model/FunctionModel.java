@@ -30,6 +30,15 @@ public class FunctionModel {
     private String name;
     private String describe;
     private Activity mActivity;
+    private String appType;
+
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
+    }
 
     public Activity getmActivity() {
         return mActivity;

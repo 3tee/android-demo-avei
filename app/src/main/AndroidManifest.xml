@@ -59,6 +59,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/default_ui_bg"></activity>
         <activity
+            android:name=".avimport.AudioMixExport"
+            android:theme="@style/default_ui_bg"></activity>
+        <activity
             android:name=".files.FileListActivity"
             android:theme="@style/default_ui_bg"></activity>
     </application>

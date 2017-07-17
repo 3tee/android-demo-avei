@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -16,6 +17,7 @@ import cn.tee3.avei.PreviewSurface;
 import cn.tee3.avei.R;
 import cn.tee3.avei.capture.AudioCaptureThread;
 import cn.tee3.avei.capture.VideoCapture;
+import cn.tee3.avei.view.AveiDialog;
 import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.TimerUtils;
@@ -64,9 +66,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         tvImportTime = (TextView) findViewById(R.id.tv_import_time);
 
         tvImport.setOnClickListener(this);
-
         mTimerUtils = new TimerUtils(tvImportTime);
-
         //加入房间，并初始化设备
         startUpVideo(roomId);
     }
@@ -255,5 +255,26 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         Log.i(TAG, "onDestory");
         stopImporter();
         AVImporter.destoryImporter(mAVimporter);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 退出
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && KeyEvent.KEYCODE_BACK == keyCode) {
+            if (isImport) {
+                AveiDialog.finishDialog(this, "正在导入,是否直接退出？", new AveiDialog.MCallBack() {
+                    @Override
+                    public boolean OnCallBackDispath(Boolean bSucceed) {
+                        finish();
+                        return false;
+                    }
+                });
+            } else {
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

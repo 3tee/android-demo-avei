@@ -6,6 +6,7 @@ import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -18,10 +19,11 @@ import cn.tee3.avd.Room;
 import cn.tee3.avd.RtspClient;
 import cn.tee3.avd.VideoOptions;
 import cn.tee3.avd.VideoRenderer;
+import cn.tee3.avei.Constants;
 import cn.tee3.avei.R;
 import cn.tee3.avei.avroom.AVRoom;
 import cn.tee3.avei.capture.AudioCaptureThread;
-import cn.tee3.avei.utils.AppKey;
+import cn.tee3.avei.view.AveiDialog;
 import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
 import cn.tee3.avei.utils.TimerUtils;
@@ -96,7 +98,7 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
 
         startUpVideo(roomId);
 
-        mRtspclient.start(AppKey.rtsp_uri, "admin", "Hik12345");
+        mRtspclient.start(Constants.DEMO_PARAMS.getOption().getUserAddress(), Constants.DEMO_PARAMS.getOption().getLogin_name(), Constants.DEMO_PARAMS.getOption().getLogin_password());
     }
 
 
@@ -233,13 +235,14 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
 
         //计时器清除
         mTimerUtils.clearTimer();
+        //message不再打印
+        mHandler.removeCallbacks(messageRunnable);
         //音频停止
         if (null != mRecordingThread) {
             mRecordingThread.stopMe();
             mRecordingThread = null;
         }
-        mTimerUtils.clearTimer();
-        mHandler.removeCallbacks(messageRunnable);
+
         videoFrameNum = 0;
         audioFrameNum = 0;
         videoDataSize = 0;
@@ -265,6 +268,27 @@ public class RtspClientImportActivity extends Activity implements View.OnClickLi
             avRoom.dispose();
             Log.i(TAG, "onDestory");
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // 退出
+        if (event.getAction() == KeyEvent.ACTION_DOWN
+                && KeyEvent.KEYCODE_BACK == keyCode) {
+            if (isImport) {
+                AveiDialog.finishDialog(this, "正在导入,是否直接退出？", new AveiDialog.MCallBack() {
+                    @Override
+                    public boolean OnCallBackDispath(Boolean bSucceed) {
+                        finish();
+                        return false;
+                    }
+                });
+            } else {
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
 

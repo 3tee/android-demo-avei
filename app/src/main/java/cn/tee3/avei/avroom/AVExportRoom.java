@@ -79,7 +79,7 @@ public class AVExportRoom extends AVRoom {
         // file type from: video codec
         MVideo.Camera camera = mvideo.getCamera(videoDeviceId);
         VideoOptions.VideoCodec videoCodec = camera.getPublishedQualities().getStreamCodec(VideoOptions.StreamType.stream_main);
-        if (VideoOptions.VideoCodec.codec_h264.equals(videoCodec.name())) {//通过编码参数来选择录制的文件类型
+        if ("codec_h264".equals(videoCodec.name())) {//通过编码参数来选择录制的文件类型
             filePath = filePath + ".mp4";
         } else {
             filePath = filePath + ".webm";
