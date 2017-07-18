@@ -3,6 +3,7 @@ package cn.tee3.avei.main;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
@@ -59,6 +60,28 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
     private TextView tvJoinroom;//加入房间
     private EditText etRoomid;//房间Id
     private ImageView ivScheduleRoom;
+
+    private String apptype = "";
+
+    private Handler mHandler = new Handler(new Handler.Callback() {
+        public boolean handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 100:
+                    /********引擎初始化，可以在AveiApp中直接写死相应的参数进行引擎初始化*******/
+                    int ret = ((AveiApp) getApplication()).AVDEngineInit(Constants.DEMO_PARAMS.getServer_uri(), Constants.DEMO_PARAMS.getAccess_key(), Constants.DEMO_PARAMS.getSecret_key());
+                    if (ErrorCode.AVD_OK != ret) {
+                        Toast.makeText(MainActivity.this, "引擎初始化失败", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "onCreate, init AVDEngine failed. ret=" + ret);
+                    } else {
+                        Constants.APP_TYPE = apptype;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,7 +178,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
      */
     public String avdGetParams() {
 //get的方式提交就是url拼接的方式
-        String apptype = Constants.SELECT_FUNCTION.getAppType();
+        apptype = Constants.SELECT_FUNCTION.getAppType();
         if (StringUtils.isEmpty(Constants.SELECT_FUNCTION.getAppType())) {
             apptype = "def";
         }
@@ -197,16 +220,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
                 out.close();
                 is.close();
                 /********引擎初始化，可以在AveiApp中直接写死相应的参数进行引擎初始化*******/
-                int ret = ((AveiApp) getApplication()).AVDEngineInit(Constants.DEMO_PARAMS.getServer_uri(), Constants.DEMO_PARAMS.getAccess_key(), Constants.DEMO_PARAMS.getSecret_key());
-                if (ErrorCode.AVD_OK != ret) {
-                    Looper.prepare();
-                    Toast.makeText(MainActivity.this, "引擎初始化失败", Toast.LENGTH_SHORT).show();
-                    Looper.loop();
-                    Log.e(TAG, "onCreate, init AVDEngine failed. ret=" + ret);
-                } else {
-                    Constants.APP_TYPE = apptype;
-                }
-                return ret + "";
+                mHandler.sendEmptyMessageDelayed(100, 50);
+                return responseCode + "";
             } else {
                 //请求失败
                 Looper.prepare();
