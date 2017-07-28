@@ -21,6 +21,7 @@ import cn.tee3.avei.R;
 import cn.tee3.avei.avroom.AVRoom;
 import cn.tee3.avei.capture.AudioCaptureThread;
 import cn.tee3.avei.capture.VideoCapture;
+import cn.tee3.avei.utils.StringUtils;
 import cn.tee3.avei.view.AveiDialog;
 import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
@@ -94,7 +95,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
         // step1: 加入房间
         avRoom = new AVRoom(roomId);
 
-        int ret = avRoom.join("testuserId", "test_username", new Room.JoinResultListener() {
+        int ret = avRoom.join(StringUtils.getUUID(), "androidUser" + (int) (Math.random() * 100000000), new Room.JoinResultListener() {
             @Override
             public void onJoinResult(int result) {
                 if (ErrorCode.AVD_OK != result) {
@@ -147,7 +148,7 @@ public class RawDataImportActivity extends Activity implements View.OnClickListe
                     TimerUtils.updatePrefixLabel("导入时长 ");
                     tvImport.setText("停止导入");
                     startImporter();
-                    mHandler.postDelayed(messageRunnable, 3000);
+                    mHandler.postDelayed(messageRunnable, 0);
                 }
                 break;
             default:

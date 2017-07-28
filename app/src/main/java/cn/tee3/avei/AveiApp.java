@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.tee3.avd.AVDEngine;
+import cn.tee3.avd.ErrorCode;
 import cn.tee3.avd.RoomInfo;
 
 /**
@@ -42,8 +43,8 @@ public class AveiApp extends Application implements AVDEngine.Listener {
 
         String logfile = tee3dir + "3tee.cn" + format.format(new Date()) + ".log";
         AVDEngine.instance().setLogParams("debug verbose", logfile);
-/*****************此处可直接进行引擎初始化*****************/
-//        int ret = AVDEngine.instance().init(getApplicationContext(), this, AppKey.tee3_avd_server, AppKey.tee3_app_key, AppKey.tee3_secret_key);
+        /*****************此处可直接进行引擎初始化*****************/
+//        int ret = AVDEngine.instance().init(getApplicationContext(), this, "3tee.cn:8080", "F89EB5C71E494850A061CC0C5F42C177", "DDDF7445961C4D27A7DCE106001BBB4F");
 //        if (ErrorCode.AVD_OK != ret) {
 //            Log.e(TAG, "onCreate, init AVDEngine failed. ret=" + ret);
 //        }

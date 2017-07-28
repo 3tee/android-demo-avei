@@ -17,6 +17,7 @@ import cn.tee3.avei.PreviewSurface;
 import cn.tee3.avei.R;
 import cn.tee3.avei.capture.AudioCaptureThread;
 import cn.tee3.avei.capture.VideoCapture;
+import cn.tee3.avei.utils.StringUtils;
 import cn.tee3.avei.view.AveiDialog;
 import cn.tee3.avei.view.EventLogView;
 import cn.tee3.avei.utils.FilesUtils;
@@ -91,7 +92,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
             }
         });
         //加入房间
-        int ret = mAVimporter.join(new User("testuserId", "test_username", ""), new AVImporter.RoomJoinResultListener() {
+        int ret = mAVimporter.join(new User(StringUtils.getUUID(), "androidUser" + (int) (Math.random() * 100000000), ""), new AVImporter.RoomJoinResultListener() {
                     @Override
                     public void onRoomJoinResult(String roomId, int result) {
                         if (ErrorCode.AVD_OK != result) {
@@ -180,6 +181,7 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
                 @Override
                 public void onAudioData(long timestamp_ns, int sampleRate, int channels, byte[] data, int len) {
                     int ret = mAVimporter.audio_inputPCMFrame(timestamp_ns, sampleRate, channels, data, len);
+                    Log.v(TAG, "audio_inputPCMFrame timestamp_ns=" + timestamp_ns + ",sampleRate=" + sampleRate + "len" + len);
                     if (0 != ret) {
                         Log.e(TAG, "audio_inputPCMFrame failed. ret=" + ret);
                         logView.addVeryImportantLog("音频导入失败：ErrorCode=" + ret);
@@ -197,12 +199,12 @@ public class AVImporterDemoActivity extends Activity implements View.OnClickList
         @Override
         public void onPreviewFrameCaptured(int width, int height, byte[] data) { // 摄像头原始图像导入
             if (null != mAVimporter && mAVimporter.isWorking()) {
-                Log.v(TAG, "video_inputRAWFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
                 if (isImport) {//导入
                     int ret = mAVimporter.video_inputRAWFrame(System.nanoTime(), width, height, data, data.length,
                             mVideoCapture.getmOrientation(), mVideoCapture.isFrontCamera(), FakeVideoCapturer.FourccType.ft_NV21);
                     videoFrameNum = videoFrameNum + 1;
                     videoDataSize = videoDataSize + data.length;
+                    Log.v(TAG, "video_inputRAWFrame mwidth=" + width + ",mheight=" + height + "" + mVideoCapture.getmOrientation());
                     if (0 != ret) {
                         Log.e(TAG, "video_inputRAWFrame failed. ret=" + ret);
                         logView.addVeryImportantLog("视频导入失败：ErrorCode=" + ret);

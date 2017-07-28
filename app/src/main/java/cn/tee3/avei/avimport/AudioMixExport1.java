@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import org.webrtc.voiceengine.WebRtcAudioUtils;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -27,17 +29,19 @@ import static java.lang.Thread.sleep;
  * Created by shengf on 2017/7/14.
  */
 
-public class AudioMixExport extends Activity implements View.OnClickListener, MAudio.MixerDataListener {
-    private static final String TAG = "AudioMixExport";
+public class AudioMixExport1 extends Activity implements View.OnClickListener, MAudio.MixerDataListener {
+    private static final String TAG = "AudioMixExport1";
 
     private TextView tvImport;
     private TextView tvMix;
     private TextView tvChange;
+    private TextView tvAecChange;
     private AVRoom avRoom;
     private FakeAudioCapturer mFakeAudioCapturer;
-    private Handler mHandler = new Handler();
+    private AudioCaptureThread mRecordingThread;
 
     private String option = "false";
+    private String eo_audio_ae_option = "false";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +50,13 @@ public class AudioMixExport extends Activity implements View.OnClickListener, MA
         tvImport = (TextView) findViewById(R.id.tv_import);
         tvMix = (TextView) findViewById(R.id.tv_mix);
         tvChange = (TextView) findViewById(R.id.tv_change);
+        tvAecChange = (TextView) findViewById(R.id.tv_aec_change);
         tvImport.setOnClickListener(this);
         tvMix.setOnClickListener(this);
         tvChange.setOnClickListener(this);
-        startUpVideo("r7");
+        tvAecChange.setOnClickListener(this);
+        WebRtcAudioUtils.enableBuiltInAEC(false);
+        startUpVideo("r8");
     }
 
     private void startUpVideo(String roomId) {
@@ -57,6 +64,7 @@ public class AudioMixExport extends Activity implements View.OnClickListener, MA
         avRoom = new AVRoom(roomId);
         avRoom.room.setOption(Room.Option.ro_audio_option_codec, "opus");
         setAVDEngineOption();
+//        setAVDEngineAudioAec();
         int ret = avRoom.join(StringUtils.getUUID(), "androidUser" + (int) (Math.random() * 100000000), new Room.JoinResultListener() {
             @Override
             public void onJoinResult(int result) {
@@ -74,12 +82,17 @@ public class AudioMixExport extends Activity implements View.OnClickListener, MA
     }
 
     private void setAVDEngineOption() {
-        AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_aec_Enable, option);
+//        AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_aec_Enable, option);
         AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_noiseSuppression_Enable, option);
         AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_highpassFilter_Enable, option);
         //AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_autoGainControl_Enable, option);
         //AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_aec_DAEcho_Enable, option);
     }
+
+    private void setAVDEngineAudioAec() {
+        AVDEngine.instance().setOption(AVDEngine.Option.eo_audio_aec_Enable, eo_audio_ae_option);
+    }
+
 
     boolean check_ret(int ret) {
         if (ErrorCode.AVD_OK != ret) {
@@ -102,66 +115,52 @@ public class AudioMixExport extends Activity implements View.OnClickListener, MA
             case R.id.tv_change:
                 if (option.equals("false")) {
                     option = "true";
+                    tvChange.setText("声音处理已打开，点击关闭");
                 } else {
                     option = "false";
+                    tvChange.setText("声音处理已关闭，点击打开");
                 }
                 setAVDEngineOption();
                 avRoom.room.setOption(Room.Option.ro_room_options_apply, "audio_options");
                 Log.i(TAG, "option:" + option);
                 break;
+            case R.id.tv_aec_change:
+                if (eo_audio_ae_option.equals("false")) {
+                    eo_audio_ae_option = "true";
+                    tvAecChange.setText("回音消除已打开，点击关闭");
+                } else {
+                    eo_audio_ae_option = "false";
+                    tvAecChange.setText("回音消除已关闭，点击打开");
+                }
+                setAVDEngineAudioAec();
+                avRoom.room.setOption(Room.Option.ro_room_options_apply, "audio_options");
+                Log.i(TAG, "eo_audio_ae_option:" + eo_audio_ae_option);
+                break;
         }
     }
 
-    private InputStream is;//文件流
-    private int samplerate = 48000;
+    private int samplerate = 44100;
     private int channels = 2;
     private int pcmsize = samplerate / 100 * channels * 2;
-    private byte[] pcm_buffer = new byte[pcmsize];//缓冲区
 
     private void startImporter() {
-//        is = getResources().openRawResource(R.raw.audio_test);
         mFakeAudioCapturer.enable(true);
         avRoom.maudio.openMicrophone();
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    long ret = readPcmData();
-                    try {
-                        sleep(ret);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        //音频导入
+        if (null == mRecordingThread) {
+            mRecordingThread = new AudioCaptureThread(new AudioCaptureThread.AudioDataListener() {
+                @Override
+                public void onAudioData(long timestamp_ns, int sampleRate, int channels, byte[] data, int len) {
+                    int ret = mFakeAudioCapturer.inputCapturedFrame(timestamp_ns, sampleRate, channels, data, len);
+                    if (0 != ret) {
+                        Log.e(TAG, "source inputCapturedFrame failed. ret=" + ret);
                     }
                 }
-            }
-        });
-        thread.start();
+            }, samplerate, channels);
+            mRecordingThread.start();
+        }
     }
 
-    private Runnable readPcmRunnable = new Runnable() {
-        public void run() {
-            long ret = readPcmData();
-            mHandler.postDelayed(readPcmRunnable, ret);
-        }
-    };
-
-    private long readPcmData() {
-        long now = System.currentTimeMillis();
-        try {
-            is.read(pcm_buffer);
-            importPcm(pcm_buffer);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        now = System.currentTimeMillis() - now;
-        if (now < 10) {//小于10ms则等待
-            now = 10 - now;
-        } else {
-            now = 0;
-        }
-        return now;
-    }
 
     private void importPcm(byte[] data) {
         long pts = System.nanoTime();
@@ -179,7 +178,10 @@ public class AudioMixExport extends Activity implements View.OnClickListener, MA
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mHandler.removeCallbacks(readPcmRunnable);
+        if (null != mFakeAudioCapturer) {
+            FakeAudioCapturer.destoryCapturer(mFakeAudioCapturer);
+            mFakeAudioCapturer = null;
+        }
         if (null != avRoom) {
             avRoom.dispose();
             Log.i(TAG, "onDestory");

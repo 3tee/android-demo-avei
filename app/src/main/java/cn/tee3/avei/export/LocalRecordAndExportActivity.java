@@ -113,7 +113,7 @@ public class LocalRecordAndExportActivity extends Activity implements View.OnCli
                 updatePublishedCameras(isCameraOpen, camera);
             }
         });
-        int ret = mRoom.join("testuserId", "test_username", new Room.JoinResultListener() {
+        int ret = mRoom.join(StringUtils.getUUID(), "androidUser" + (int) (Math.random() * 100000000), new Room.JoinResultListener() {
             @Override
             public void onJoinResult(int result) {
                 if (ErrorCode.AVD_OK != result) {

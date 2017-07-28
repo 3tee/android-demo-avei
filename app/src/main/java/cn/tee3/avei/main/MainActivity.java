@@ -35,6 +35,7 @@ import cn.tee3.avei.Constants;
 import cn.tee3.avei.R;
 import cn.tee3.avei.avimport.AVImporterDemoActivity;
 import cn.tee3.avei.avimport.AudioMixExport;
+import cn.tee3.avei.avimport.AudioMixExport1;
 import cn.tee3.avei.avimport.EncodedImportActivity;
 import cn.tee3.avei.avimport.RawDataImportActivity;
 import cn.tee3.avei.avimport.RtspClientImportActivity;
@@ -132,7 +133,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Adap
             case R.id.tv_joinroom:
                 //查询房间是否存在
                 AVDEngine.instance().getRoomByRoomId(roomId);
-//                Intent intent = new Intent(this, AudioMixExport.class);
+//                Intent intent = new Intent(this, AudioMixExport1.class);
 //                startActivity(intent);
                 break;
             case R.id.iv_schedule_room:

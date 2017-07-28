@@ -10,10 +10,11 @@ import android.util.Log;
  */
 public class AudioCaptureThread extends Thread {
     private static final String TAG = "AudioCaptureThread";
-    private final int kSampleRate = 16000;
-    private final int kChannelMode = AudioFormat.CHANNEL_IN_MONO;
     private final int kEncodeFormat = AudioFormat.ENCODING_PCM_16BIT;
-    private final int kFrameSize = 2 * 16000 / 100; // 10ms data
+    private int kSampleRate = 16000;
+    private int kChannelMode = AudioFormat.CHANNEL_IN_MONO;
+    private int kChannels = 1;
+    private int kFrameSize = 2 * 16000 / 100; // 10ms data
 
     private boolean mRunning = false;
     private AudioRecord mAudioRecord;
@@ -25,6 +26,13 @@ public class AudioCaptureThread extends Thread {
     AudioDataListener mListener;
 
     public AudioCaptureThread(AudioDataListener listener) {
+        this.mListener = listener;
+    }
+    public AudioCaptureThread(AudioDataListener listener, int sampleRate, int channels) {
+        this.kSampleRate = sampleRate;
+        this.kChannels = channels;
+        this.kChannelMode = (2 == channels) ? AudioFormat.CHANNEL_IN_STEREO : AudioFormat.CHANNEL_IN_MONO;
+        this.kFrameSize = 2 * kSampleRate * kChannels/ 100;
         this.mListener = listener;
     }
 
@@ -59,7 +67,7 @@ public class AudioCaptureThread extends Thread {
                     break;
                 }
                 if (null != mListener) {
-                    mListener.onAudioData(System.nanoTime(), kSampleRate, 1, bufAudio, recLen);
+                    mListener.onAudioData(System.nanoTime(), kSampleRate, kChannels, bufAudio, recLen);
                 }
             }
             Log.d(TAG, "exit loop");
