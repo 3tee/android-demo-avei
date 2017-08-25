@@ -16,6 +16,11 @@
 
     </cn.tee3.avei.view.EventLogView>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
